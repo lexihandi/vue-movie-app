@@ -16,11 +16,47 @@
         </div>
       </router-link>
     </div>
+
+    <form @submit.prevent="SearchMovies()" class="search-box">
+      <input
+        type="text"
+        placeholder="What movie are you looking for?"
+        v-model="search"
+      />
+      <input type="submit" value="Search" />
+    </form>
+
+    <div class="movies-list">Movies</div>
   </div>
 </template>
 
 <script>
-export default {};
+import { ref } from "vue";
+import env from "../../env";
+
+export default {
+  setup() {
+    const search = ref("");
+    const movies = ref([]);
+
+    const SearchMovies = () => {
+      if (search.value != "") {
+        fetch(`http://www.omdbapi.com/?apikey=${env.apikey}&s=${search.value}`)
+          .then((response) => response.json())
+          .then((data) => {
+            movies.value = data.Search;
+            search.value = "";
+            console.log(movies.value);
+          });
+      }
+    };
+    return {
+      search,
+      movies,
+      SearchMovies,
+    };
+  },
+};
 </script>
 
 <style lang="scss">
@@ -54,6 +90,57 @@ export default {};
 
       p {
         color: #fff;
+      }
+    }
+  }
+
+  .search-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 16px;
+    align-items: center;
+
+    input {
+      display: block;
+      appearance: none;
+      border: none;
+      outline: none;
+      background: none;
+
+      &[type="text"] {
+        width: 100%;
+        color: #fff;
+        background-color: #496583;
+        font-size: 20px;
+        padding: 10px 16px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        transition: 0.4s;
+
+        &::placeholder {
+          color: #f3f3f3;
+        }
+
+        &:focus {
+          box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+        }
+      }
+
+      &[type="submit"] {
+        width: 100%;
+        max-width: 300px;
+        background-color: #42b883;
+        padding: 16px;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 20px;
+        text-transform: uppercase;
+        transition: 0.4s;
+
+        &:active {
+          background-color: #3b8070;
+        }
       }
     }
   }
